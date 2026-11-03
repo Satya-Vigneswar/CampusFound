@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${editing ? 'Edit report' : 'Report an item'} + ' | CampusFind'">Report an item | CampusFind</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+
+<header class="navbar">
+    <a href="/" class="brand"><span class="brand-icon">C</span> CampusFind</a>
+    <nav>
+        <a href="/" class="nav-keep">Home</a>
+        <a href="/reports" class="nav-keep">My reports</a>
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit" class="nav-button">Log out</button>
+        </form>
+    </nav>
+</header>
+
+<main class="auth-layout">
+    <section class="auth-intro">
+        <span class="eyebrow">CAMPUS COMMUNITY BOARD</span>
+        <h1 th:text="${editing ? 'Update your report' : 'Report an item'}">Report an item</h1>
+        <p>Share enough detail for someone to recognize the item. Your account information is never shown on the public board.</p>
+    </section>
+
+    <section class="auth-card">
+        <h2 th:text="${editing ? 'Edit report details' : 'Item details'}">Item details</h2>
+        <p class="auth-copy">All fields are required. Reports are visible to everyone browsing CampusFind.</p>
+        <form th:action="${formAction}" th:object="${form}" method="post" class="auth-form">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+            </div>
+            <label>
+                Report type
+                <select th:field="*{reportType}">
+                    <option value="">Choose one</option>
+                    <option value="LOST">Lost</option>
+                    <option value="FOUND">Found</option>
+                </select>
+                <span class="field-error" th:if="${#fields.hasErrors('reportType')}" th:errors="*{reportType}"></span>
+            </label>
+            <label>
+                Item title
+                <input type="text" th:field="*{title}" maxlength="120" placeholder="e.g. Blue water bottle">
+                <span class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+            </label>
+            <label>
+                Category
+                <input type="text" th:field="*{category}" maxlength="60" placeholder="e.g. Personal item">
+                <span class="field-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></span>
+            </label>
+            <label>
+                Location
+                <input type="text" th:field="*{location}" maxlength="160" placeholder="e.g. Science building, room 204">
+                <span class="field-error" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></span>
+            </label>
+            <label>
+                Description
+                <textarea th:field="*{description}" maxlength="2000" rows="5" placeholder="Include color, brand, or other identifying details."></textarea>
+                <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+            </label>
+            <button type="submit" class="primary-button auth-submit" th:text="${editing ? 'Save changes' : 'Publish report'}">Publish report</button>
+        </form>
+        <p class="auth-switch"><a href="/reports">Cancel and return to my reports</a></p>
+    </section>
+</main>
+
+</body>
+</html>

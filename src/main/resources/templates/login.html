@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in | CampusFind</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+
+<header class="navbar">
+    <a href="/" class="brand">
+        <span class="brand-icon">C</span>
+        CampusFind
+    </a>
+    <nav>
+        <a href="/" class="nav-keep">Home</a>
+        <a href="/register" class="nav-button">Create account</a>
+    </nav>
+</header>
+
+<main class="auth-layout">
+    <section class="auth-intro">
+        <span class="eyebrow">WELCOME BACK</span>
+        <h1>Sign in to<br><span>CampusFind</span></h1>
+        <p>Report lost items, manage found posts, and help belongings get home.</p>
+    </section>
+
+    <section class="auth-card">
+        <h2>Student login</h2>
+        <p class="auth-copy">Use the email and password you registered with.</p>
+
+        <p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+        <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+
+        <form th:action="@{/login}" method="post" class="auth-form">
+            <label>
+                Email
+                <input type="email" name="email" required autocomplete="username" placeholder="you@college.edu">
+            </label>
+            <label>
+                Password
+                <input type="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
+            </label>
+            <button type="submit" class="primary-button auth-submit">Log in</button>
+        </form>
+
+        <p class="auth-switch">New to CampusFind? <a href="/register">Create an account</a></p>
+    </section>
+</main>
+
+</body>
+</html>

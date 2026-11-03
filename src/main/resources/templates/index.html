@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusFind | Lost & Found</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="brand">
+        <span class="brand-icon">C</span>
+        CampusFind
+    </a>
+
+    <nav>
+        <a href="#items">Browse items</a>
+        <a href="#how">How it works</a>
+        <a th:if="${currentStudent == null}" href="/login" class="nav-keep">Log in</a>
+        <a th:if="${currentStudent == null}" href="/register" class="nav-button">Create account</a>
+        <a th:if="${currentStudent != null}" href="/dashboard" class="nav-keep">Dashboard</a>
+        <a th:if="${currentStudent != null}" href="/report" class="nav-keep">My reports</a>
+        <form th:if="${currentStudent != null}" th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit" class="nav-button">Log out</button>
+        </form>
+        <a th:href="${currentStudent == null ? '/login' : '/report'}" class="nav-button">Report an item</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="hero-content">
+            <span class="eyebrow">YOUR CAMPUS. YOUR COMMUNITY.</span>
+
+            <h1>Lost something?<br>
+                <span>Let's find it.</span>
+            </h1>
+
+            <p>
+                A smarter campus lost and found platform.
+                Report missing belongings, help others recover theirs,
+                and bring lost items back to their owners.
+            </p>
+
+            <div class="hero-actions">
+                <a href="#items" class="primary-button">Explore items →</a>
+                <a th:href="${currentStudent == null ? '/login' : '/report'}" class="secondary-button">Report an item</a>
+            </div>
+
+            <div class="trust-note">
+                <span class="status-dot"></span>
+                Built for students, by students.
+            </div>
+        </div>
+
+        <div class="hero-art">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="floating-card card-one">LOST <span>Community report</span></div>
+            <div class="floating-card card-two">FOUND <span>Community report</span></div>
+            <div class="main-illustration">🎒</div>
+            <div class="floating-label">Good things find their way home.</div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div><strong>01</strong><span>Report a lost item</span></div>
+        <div><strong>02</strong><span>Browse found items</span></div>
+        <div><strong>03</strong><span>Reconnect with your item</span></div>
+    </section>
+
+    <section class="items-section" id="items">
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">THE COMMUNITY BOARD</span>
+                <h2>Recently reported items</h2>
+                <p>Search public reports by title, description, category, or location.</p>
+            </div>
+        </div>
+
+        <form action="/" method="get" class="board-search">
+            <label class="sr-only" for="searchInput">Search reports</label>
+            <input
+                type="search"
+                id="searchInput"
+                name="q"
+                class="search-input"
+                th:value="${query}"
+                placeholder="Search titles, descriptions, categories, or locations..."
+            >
+            <div class="filter-row" aria-label="Filter by report type">
+                <button class="filter" th:classappend="${type == 'ALL' ? ' active' : ''}" name="type" value="ALL">All items</button>
+                <button class="filter" th:classappend="${type == 'LOST' ? ' active' : ''}" name="type" value="LOST">Lost</button>
+                <button class="filter" th:classappend="${type == 'FOUND' ? ' active' : ''}" name="type" value="FOUND">Found</button>
+                <button type="submit" class="filter search-submit">Search</button>
+            </div>
+        </form>
+
+        <div class="item-grid" id="itemGrid" th:if="${!#lists.isEmpty(items)}">
+            <article class="item-card" th:each="item : ${items}">
+                <div class="item-image lavender" aria-hidden="true">🎒</div>
+                <div class="item-info">
+                    <span class="item-status"
+                          th:classappend="${item.reportType.name() == 'LOST' ? ' lost-label' : ' found-label'}"
+                          th:text="${item.reportType.name() + ' ITEM'}">LOST ITEM</span>
+                    <h3><a th:href="@{/items/{id}(id=${item.id})}" th:text="${item.title}">Item title</a></h3>
+                    <p th:text="${item.description}">Item description</p>
+                    <span class="item-location" th:text="${'📍 ' + item.location}">📍 Location</span>
+                    <span class="item-category" th:text="${item.category}">Category</span>
+                </div>
+            </article>
+        </div>
+
+        <p class="empty-message" th:if="${#lists.isEmpty(items)}">
+            No reports match your search yet. Try another term or check back later.
+        </p>
+    </section>
+
+    <section class="report-section" id="report">
+        <div>
+            <span class="eyebrow">HELP YOUR CAMPUS</span>
+            <h2>Found something?<br>Be someone's hero.</h2>
+            <p>Every report brings a lost belonging one step closer to home.</p>
+        </div>
+        <a th:href="${currentStudent == null ? '/login' : '/report'}" class="primary-button">Report an item →</a>
+    </section>
+
+    <section class="how-section" id="how">
+        <span class="eyebrow">HOW CAMPUSFIND HELPS</span>
+        <h2>Useful leads, reviewed by students</h2>
+        <p>When a report is posted, CampusFind compares its words with open reports of the opposite type. Up to five candidates scoring at least 15% are suggested.</p>
+        <div class="matching-explainer">
+            <article>
+                <span class="explainer-number">01</span>
+                <h3>Compare useful details</h3>
+                <p>Title (35%), category (20%), description (25%), and location (20%) each contribute to a simple word-overlap score.</p>
+            </article>
+            <article>
+                <span class="explainer-number">02</span>
+                <h3>Review promising leads</h3>
+                <p>Potential matches are ranked and shown on report details and your dashboard so you can decide what is relevant.</p>
+            </article>
+            <article>
+                <span class="explainer-number">03</span>
+                <h3>You stay in control</h3>
+                <p>A match score is a similarity aid, not a probability or confirmation. CampusFind never marks an item returned automatically.</p>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <a href="/" class="brand"><span class="brand-icon">C</span> CampusFind</a>
+    <p>Made with care for the campus community.</p>
+</footer>
+
+</body>
+</html>

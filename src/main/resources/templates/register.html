@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create account | CampusFind</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+
+<header class="navbar">
+    <a href="/" class="brand">
+        <span class="brand-icon">C</span>
+        CampusFind
+    </a>
+    <nav>
+        <a href="/" class="nav-keep">Home</a>
+        <a href="/login" class="nav-button">Log in</a>
+    </nav>
+</header>
+
+<main class="auth-layout">
+    <section class="auth-intro">
+        <span class="eyebrow">JOIN THE CAMPUS BOARD</span>
+        <h1>Create your<br><span>student account</span></h1>
+        <p>One account lets you report items and follow what the community finds.</p>
+    </section>
+
+    <section class="auth-card">
+        <h2>Register</h2>
+        <p class="auth-copy">All fields are required. Passwords are stored hashed, never as plain text.</p>
+
+        <form th:action="@{/register}" th:object="${form}" method="post" class="auth-form">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+            </div>
+            <label>
+                Full name
+                <input type="text" th:field="*{name}" placeholder="Ada Lovelace">
+                <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+            </label>
+            <label>
+                College email
+                <input type="email" th:field="*{email}" autocomplete="username" placeholder="you@college.edu">
+                <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </label>
+            <label>
+                Student ID
+                <input type="text" th:field="*{studentId}" placeholder="e.g. STU2026">
+                <span class="field-error" th:if="${#fields.hasErrors('studentId')}" th:errors="*{studentId}"></span>
+            </label>
+            <label>
+                Password
+                <input type="password" th:field="*{password}" autocomplete="new-password" placeholder="At least 8 characters">
+                <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+            </label>
+            <label>
+                Confirm password
+                <input type="password" th:field="*{confirmPassword}" autocomplete="new-password" placeholder="Repeat your password">
+                <span class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
+            </label>
+            <button type="submit" class="primary-button auth-submit">Create account</button>
+        </form>
+
+        <p class="auth-switch">Already registered? <a href="/login">Log in</a></p>
+    </section>
+</main>
+
+</body>
+</html>

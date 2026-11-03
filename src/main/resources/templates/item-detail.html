@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${item.title} + ' | CampusFind'">Item report | CampusFind</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="brand"><span class="brand-icon">C</span> CampusFind</a>
+    <nav>
+        <a href="/" class="nav-keep">Browse items</a>
+        <a th:if="${currentStudent == null}" href="/login" class="nav-button">Log in</a>
+        <a th:if="${currentStudent == null}" href="/register" class="nav-keep">Create account</a>
+        <a th:if="${currentStudent != null}" href="/dashboard" class="nav-keep">Dashboard</a>
+        <a th:if="${currentStudent != null}" href="/report" class="nav-keep">Create report</a>
+        <form th:if="${currentStudent != null}" th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit" class="nav-button">Log out</button>
+        </form>
+    </nav>
+</header>
+
+<main class="page-shell">
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+    <a href="/#items" class="auth-switch">← Back to the community board</a>
+    <article class="profile-card item-detail">
+        <span class="item-status"
+              th:classappend="${item.reportType.name() == 'LOST' ? ' lost-label' : ' found-label'}"
+              th:text="${item.reportType.name() + ' ITEM'}">LOST ITEM</span>
+        <h1 th:text="${item.title}">Item title</h1>
+        <div class="detail-meta">
+            <span><strong>Category:</strong> <span th:text="${item.category}">Category</span></span>
+            <span><strong>Location:</strong> <span th:text="${item.location}">Location</span></span>
+            <span><strong>Status:</strong> <span th:text="${item.status.name()}">OPEN</span></span>
+            <span><strong>Reported:</strong> <time th:datetime="${item.createdAt}" th:text="${#temporals.format(item.createdAt, 'MMM d, yyyy')}">Date</time></span>
+        </div>
+        <h2>Description</h2>
+        <p class="detail-description" th:text="${item.description}">Description</p>
+        <p class="privacy-note">Reporter account details are kept private. Please do not include personal contact information in reports.</p>
+        <div class="report-actions" th:if="${itemOwner}">
+            <a class="secondary-button" th:href="@{/reports/{id}/edit(id=${item.id})}">Edit report</a>
+            <form th:action="@{/reports/{id}/delete(id=${item.id})}" method="post"
+                  onsubmit="return confirm('Delete this report? This cannot be undone.');">
+                <button class="danger-button" type="submit">Delete report</button>
+            </form>
+        </div>
+    </article>
+
+    <section class="matches-section" th:if="${item.status.name() == 'OPEN'}">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">STUDENT-REVIEWED LEADS</span>
+                <h2>Potential matches</h2>
+                <p>Only open reports of the opposite type scoring at least 15% are shown, ranked by score (up to five). A score summarizes word overlap; it is not a probability or a confirmed recovery.</p>
+            </div>
+        </div>
+        <div class="match-grid" th:if="${!#lists.isEmpty(matches)}">
+            <article class="match-card" th:each="match : ${matches}">
+                <div class="match-heading">
+                    <span class="item-status"
+                          th:classappend="${match.item.reportType.name() == 'LOST' ? ' lost-label' : ' found-label'}"
+                          th:text="${match.item.reportType.name() + ' ITEM'}">FOUND ITEM</span>
+                    <strong class="match-score" th:text="${match.score + '% similar'}">75% similar</strong>
+                </div>
+                <h3><a th:href="@{/items/{id}(id=${match.item.id})}" th:text="${match.item.title}">Possible match</a></h3>
+                <p th:text="${match.item.description}">Report description</p>
+                <p class="item-location" th:text="${'📍 ' + match.item.location}">Location</p>
+                <p class="match-breakdown"
+                   th:text="${'Title ' + match.titleSimilarity + '% · Category ' + match.categorySimilarity + '% · Description ' + match.descriptionSimilarity + '% · Location ' + match.locationSimilarity + '%'}">
+                    Title 80% · Category 100% · Description 60% · Location 75%
+                </p>
+            </article>
+        </div>
+        <p class="empty-message" th:if="${#lists.isEmpty(matches)}">No close open reports found yet. New reports may surface a lead later.</p>
+        <p class="match-method-note">Score weights: title 35%, category 20%, description 25%, location 20%. Similarity in each field is based on normalized word overlap.</p>
+    </section>
+</main>
+
+</body>
+</html>

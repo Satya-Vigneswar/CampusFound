@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My reports | CampusFind</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="brand"><span class="brand-icon">C</span> CampusFind</a>
+    <nav>
+        <a href="/" class="nav-keep">Home</a>
+        <a href="/dashboard" class="nav-keep">Dashboard</a>
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit" class="nav-button">Log out</button>
+        </form>
+    </nav>
+</header>
+
+<main class="page-shell">
+    <section class="page-heading">
+        <span class="eyebrow">REPORT MANAGEMENT</span>
+        <h1>Your lost and found posts</h1>
+        <p>Only you can edit or delete the reports associated with your account.</p>
+        <a href="/report" class="primary-button">Create a report</a>
+    </section>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <section class="item-grid" th:if="${!#lists.isEmpty(reports)}">
+        <article class="item-card" th:each="item : ${reports}">
+            <div class="item-info">
+                <span class="item-status"
+                      th:classappend="${item.reportType.name() == 'LOST' ? ' lost-label' : ' found-label'}"
+                      th:text="${item.reportType.name() + ' ITEM'}">LOST ITEM</span>
+                <h3><a th:href="@{/items/{id}(id=${item.id})}" th:text="${item.title}">Item title</a></h3>
+                <p th:text="${item.description}">Description</p>
+                <span class="item-location" th:text="${'📍 ' + item.location}">📍 Location</span>
+                <span class="item-category" th:text="${item.category}">Category</span>
+                <div class="report-actions">
+                    <a class="secondary-button" th:href="@{/reports/{id}/edit(id=${item.id})}">Edit</a>
+                    <form th:action="@{/reports/{id}/delete(id=${item.id})}" method="post"
+                          onsubmit="return confirm('Delete this report? This cannot be undone.');">
+                        <button class="danger-button" type="submit">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="profile-card empty-reports" th:if="${#lists.isEmpty(reports)}">
+        <h2>No reports yet</h2>
+        <p>When you report something lost or found, it will appear here for you to manage.</p>
+        <a href="/report" class="primary-button">Create your first report</a>
+    </section>
+</main>
+
+</body>
+</html>
